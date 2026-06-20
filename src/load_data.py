@@ -11,10 +11,46 @@ def load_sipri():
                 "Croatia","Hungary","North Macedonia","Sweden","Czechia","Iceland","Norway",
                 "Türkiye","Denmark","Italy","Poland","United Kingdom","Estonia",
                 "Latvia","Portugal","United States of America"]
+    iso_mapping = {
+        "Albania": "ALB",
+        "Belgium": "BEL",
+        "Bulgaria": "BGR",
+        "Canada": "CAN",
+        "Croatia": "HRV",
+        "Czechia": "CZE",
+        "Denmark": "DNK",
+        "Estonia": "EST",
+        "Finland": "FIN",
+        "France": "FRA",
+        "Germany": "DEU",
+        "Greece": "GRC",
+        "Hungary": "HUN",
+        "Iceland": "ISL",
+        "Italy": "ITA",
+        "Latvia": "LVA",
+        "Lithuania": "LTU",
+        "Luxembourg": "LUX",
+        "Montenegro": "MNE",
+        "Netherlands": "NLD",
+        "North Macedonia": "MKD",
+        "Norway": "NOR",
+        "Poland": "POL",
+        "Portugal": "PRT",
+        "Romania": "ROU",
+        "Slovakia": "SVK",
+        "Slovenia": "SVN",
+        "Spain": "ESP",
+        "Sweden": "SWE",
+        'Türkiye': 'TUR',
+        'United Kingdom': 'GBR',
+        'United States of America': 'USA'
+
+    }
     
     filtered_df = df[df["Country"].isin(nato_members)]
     df_sipri = filtered_df.drop(columns=["Notes"])
     df_sipri= pd.melt(df_sipri, id_vars=["Country"], var_name="year", value_name="spending_pct_gdp")
+    df_sipri["Country Code"] = df_sipri["Country"].map(iso_mapping)
     df_sipri["year"] = pd.to_numeric(df_sipri["year"], errors="coerce")
     df_sipri["spending_pct_gdp"] = pd.to_numeric(df_sipri["spending_pct_gdp"], errors="coerce")
     df_sipri["spending_pct_gdp"] = df_sipri["spending_pct_gdp"] * 100
@@ -42,7 +78,10 @@ def load_world_bank():
     df_world_bank = df_world_bank[df_world_bank["year"] >= 2000]
 
     return df_world_bank
-    
+
+def merge_datasets():
+    return pd.merge(load_sipri(), load_world_bank(), on=["Country Code", "year"], how="inner").drop(columns=["Country"])
+
 if __name__ == "__main__":
     df_sipri = load_sipri()
     print("SIPRI:", df_sipri.shape)
@@ -51,3 +90,8 @@ if __name__ == "__main__":
     df_wb = load_world_bank()
     print("World Bank:", df_wb.shape)
     print(df_wb.head())
+
+    df_merged = merge_datasets()
+    print("Merged:", df_merged.shape)
+    print(df_merged.head())
+    print(df_merged.columns.tolist())
