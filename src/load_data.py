@@ -23,7 +23,31 @@ def load_sipri():
     
     return df_sipri
 
+
+
+def load_world_bank():
+    df = pd.read_excel(os.path.join(RAW_DATA_PATH,"API_NY.GDP.MKTP.CD_DS2_en_excel_v2_121619.xls"), sheet_name="Data", skiprows=3)
+    nato_members = [
+    "ALB", "BEL", "BGR", "CAN", "HRV", "CZE", "DNK", "EST", 
+    "FIN", "FRA", "DEU", "GRC", "HUN", "ISL", "ITA", "LVA", 
+    "LTU", "LUX", "MNE", "NLD", "MKD", "NOR", "POL", "PRT", 
+    "ROU", "SVK", "SVN", "ESP", "SWE", "TUR", "GBR", "USA"
+]
+    filtered_df = df[df["Country Code"].isin(nato_members)]
+    df_world_bank = filtered_df.drop(columns=["Indicator Name", "Indicator Code"])
+    df_world_bank = pd.melt(df_world_bank, id_vars=["Country Name", "Country Code"], var_name="year", value_name="gdp")
+    df_world_bank["year"] = pd.to_numeric(df_world_bank["year"], errors="coerce")
+    df_world_bank["gdp"] = pd.to_numeric(df_world_bank["gdp"], errors="coerce")
+    df_world_bank = df_world_bank.dropna(subset=["gdp"])
+    df_world_bank = df_world_bank[df_world_bank["year"] >= 2000]
+
+    return df_world_bank
+    
 if __name__ == "__main__":
-    df = load_sipri()
-    print(df.head())
-    print(df.shape)
+    df_sipri = load_sipri()
+    print("SIPRI:", df_sipri.shape)
+    print(df_sipri.head())
+    
+    df_wb = load_world_bank()
+    print("World Bank:", df_wb.shape)
+    print(df_wb.head())
