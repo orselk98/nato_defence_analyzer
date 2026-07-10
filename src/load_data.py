@@ -1,5 +1,7 @@
 import pandas as pd
 import os
+from features import engineer_features
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW_DATA_PATH = os.path.join(BASE_DIR, "data", "raw")
 
@@ -55,7 +57,7 @@ def load_sipri():
     df_sipri["spending_pct_gdp"] = pd.to_numeric(df_sipri["spending_pct_gdp"], errors="coerce")
     df_sipri["spending_pct_gdp"] = df_sipri["spending_pct_gdp"] * 100
     df_sipri= df_sipri.dropna(subset=["spending_pct_gdp"])
-    df_sipri= df_sipri[df_sipri["year"] >= 2000]   
+    df_sipri= df_sipri[df_sipri["year"] >= 1995]   
     
     return df_sipri
 
@@ -95,3 +97,12 @@ if __name__ == "__main__":
     print("Merged:", df_merged.shape)
     print(df_merged.head())
     print(df_merged.columns.tolist())
+
+    df_merged = merge_datasets()
+    df_features = engineer_features(df_merged)
+    print(df_features.shape)
+    print(df_features.columns.tolist())
+    print(df_features.head(20))
+
+    print(df_features[df_features["year"] == 2001].head(10))
+    print(df_features[df_features["year"] == 2002].head(5))
