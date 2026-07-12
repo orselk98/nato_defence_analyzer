@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 from features import engineer_features
+from model import train_model
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW_DATA_PATH = os.path.join(BASE_DIR, "data", "raw")
@@ -106,3 +107,7 @@ if __name__ == "__main__":
 
     print(df_features[df_features["year"] == 2001].head(10))
     print(df_features[df_features["year"] == 2002].head(5))
+
+    model, mae, r2 = train_model(df_features)
+    print(f"MAE: {mae:.4f}")
+    print(f"R2: {r2:.4f}")
